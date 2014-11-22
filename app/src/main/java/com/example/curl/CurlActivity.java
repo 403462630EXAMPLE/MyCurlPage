@@ -45,6 +45,7 @@ public class CurlActivity extends Activity {
     private ArrayList<String> contents = new ArrayList<String>();
     private ArrayList<String> backContents = new ArrayList<String>();
     private ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
+    private ArrayList<Bitmap> backBitmaps = new ArrayList<Bitmap>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,9 @@ public class CurlActivity extends Activity {
         contents.add("第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页");
         contents.add("第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页第三页");
         contents.add("第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页第四页");
-        contents.add("默认不给TextView设置内边距，那么像什么paddingTop的值就是0，通过getPaddingTop()获取到的值就是0，但是实际情况却是这是一个TextView，文本内容的顶部和TextView的顶部有一段距离，但是这时候通过getPaddingTop()获取到的值确实是0，而且这个距离会随着文字字体大小变化而变化，字体越大，距离越大，现在的问题是有没有办法去掉这个距离，我知道给paddingTop设为负数，但是，我想重写一个TextView，让它自动根");
+        contents.add("11111111111111111111那么像什么paddingTop的值就是0，通过getPaddingTop()获取到的值就是0，但是实际情况却是这是一个TextView，文本内容的顶部和TextView的顶部有一段距离，但是这时候通过getPaddingTop()获取到的值确实是0，而且这个距离会随着文字字体大小变化而变化，字体越大，距离越大，现在的问题是有没有办法去掉这个距离，我知道给paddingTop设为负数，但是，我想重写一个TextView，让它自动根");
+        contents.add("22222222222222222边距，那么像什么paddingTop的值就是0，通过getPaddingTop()获取到的值就是0，但是实际情况却是这是一个TextView，文本内容的顶部和TextView的顶部有一段距离，但是这时候通过getPaddingTop()获取到的值确实是0，而且这个距离会随着文字字体大小变化而变化，字体越大，距离越大，现在的问题是有没有办法去掉这个距离，我知道给paddingTop设为负数，但是，我想重写一个TextView，让它自动根");
+        contents.add("33333333333333333置内边距，那么像什么paddingTop的值就是0，通过getPaddingTop()获取到的值就是0，但是实际情况却是这是一个TextView，文本内容的顶部和TextView的顶部有一段距离，但是这时候通过getPaddingTop()获取到的值确实是0，而且这个距离会随着文字字体大小变化而变化，字体越大，距离越大，现在的问题是有没有办法去掉这个距离，我知道给paddingTop设为负数，但是，我想重写一个TextView，让它自动根");
 
         backContents.add("默认不给TextView设置内边距，那么像什么paddingTop的值就是0，通过getPaddingTop()获取到的值就是0，但是实际情况却是这是一个TextView，文本内容的顶部和TextView的顶部有一段距离，但是这时候通过getPaddingTop()获取到的值确实是0，而且这个距离会随着文字字体大小变化而变化，字体越大，距离越大，现在的问题是有没有办法去掉这个距离，我知道给paddingTop设为负数，但是，我想重写一个TextView，让它自动根据文字大小适应，或者谁能告诉我，TextView是在哪个地方将文本画到canvas上的。默认不给TextView设置内边距，那么像什么paddingTop的值就是0，通过getPaddingTop()获取到的值就是0，但是实际情况却是这是一个TextView，文本内容的顶部和TextView的顶部有一段距离，但是这时候通过getPaddingTop()获取到的值确实是0，而且这个距离会随着文字字体大小变化而变化，字体越大，距离越大，现在的问题是有没有办法去掉这个距离，我知道给paddingTop设为负数，但是，我想重写一个TextView，让它自动根据文字大小适应，或者谁能告诉我，TextView是在哪个地方将文本画到canvas上的。默认不给TextView设置内边距，那么像什么paddingTop的值就是0，通过getPaddingTop()获取到的值就是0，但是实际情况却是这是一个TextView，文本内容的顶部和TextView的顶部有一段距离，但是这时候通过getPaddingTop()获取到的值确实是0，而且这个距离会随着文字字体大小变化而变化，字体越大，距离越大，现在的问题是有没有办法去掉这个距离，我知道给paddingTop设为负数，但是，我想重写一个TextView，让它自动根据文字大小适应，或者谁能告诉我，TextView是在哪个地方将文本画到canvas上的。");
         backContents.add("第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页第二页");
@@ -69,15 +72,23 @@ public class CurlActivity extends Activity {
         bitmaps.add(BitmapFactory.decodeResource(getResources(), R.drawable.taipei_101));
         bitmaps.add(BitmapFactory.decodeResource(getResources(), R.drawable.world));
 
+        backBitmaps.add(BitmapFactory.decodeResource(getResources(), R.drawable.world));
+        backBitmaps.add(BitmapFactory.decodeResource(getResources(), R.drawable.taipei_101));
+        backBitmaps.add(BitmapFactory.decodeResource(getResources(), R.drawable.road_rage));
+        backBitmaps.add(BitmapFactory.decodeResource(getResources(), R.drawable.obama));
+        backBitmaps.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon));
+
         int index = 0;
 		if (getLastNonConfigurationInstance() != null) {
 			index = (Integer) getLastNonConfigurationInstance();
 		}
         textPageProviderAdapter = new TextPageProviderAdapter(contents);
         imagePageProviderAdapter = new ImagePageProviderAdapter(bitmaps);
+        imagePageProviderAdapter.setBackDatas(backBitmaps);
+        textPageProviderAdapter.setBackDatas(backContents);
 		mCurlView = (CurlView) findViewById(R.id.curl);
-//		mCurlView.setPageProvider(textPageProviderAdapter);
-        mCurlView.setPageProvider(imagePageProviderAdapter);
+		mCurlView.setPageProvider(textPageProviderAdapter);
+//        mCurlView.setPageProvider(imagePageProviderAdapter);
 
 		mCurlView.setSizeChangedObserver(new SizeChangedObserver());
 		mCurlView.setCurrentIndex(index);
@@ -279,11 +290,9 @@ public class CurlActivity extends Activity {
 			if (w > h) {
 				mCurlView.setViewMode(CurlView.SHOW_TWO_PAGES);
 				mCurlView.setMargins(.1f, .05f, .1f, .05f);
-                textPageProviderAdapter.setBackDatas(backContents);
 			} else {
 				mCurlView.setViewMode(CurlView.SHOW_ONE_PAGE);
 				mCurlView.setMargins(.0f, .0f, .0f, .0f);
-                textPageProviderAdapter.setBackDatas(null);
 			}
 		}
 	}

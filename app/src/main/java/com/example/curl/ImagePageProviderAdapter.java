@@ -12,29 +12,21 @@ import android.graphics.drawable.Drawable;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
 
 /**
  * Created by fc on 14-11-21.
  */
-public class ImagePageProviderAdapter implements CurlView.PageProvider {
-    private int viewMode = CurlRenderer.SHOW_ONE_PAGE;
-    private int margin = 10;
-    private int padding = 20;
-    private int border = 5;
-    private int borderColor = 0xFF000000;
-    private int background = 0xFFC0C0C0;
+public class ImagePageProviderAdapter extends BasePageProviderAdapter {
     private boolean isRotation = true;
     private ArrayList<Bitmap> datas;
     private ArrayList<Bitmap> backDatas;
 
     public ImagePageProviderAdapter(int margin, int padding, int border, int borderColor, int background, ArrayList<Bitmap> datas, ArrayList<Bitmap> backDatas) {
-        this.margin = margin;
-        this.padding = padding;
-        this.border = border;
-        this.borderColor = borderColor;
-        this.background = background;
+        super(margin, padding, border, borderColor, background);
         this.datas = datas;
         this.backDatas = backDatas;
     }
@@ -51,26 +43,6 @@ public class ImagePageProviderAdapter implements CurlView.PageProvider {
         this.isRotation = isRotation;
     }
 
-    public void setMargin(int margin) {
-        this.margin = margin;
-    }
-
-    public void setPadding(int padding) {
-        this.padding = padding;
-    }
-
-    public void setBorder(int border) {
-        this.border = border;
-    }
-
-    public void setBorderColor(int borderColor) {
-        this.borderColor = borderColor;
-    }
-
-    public void setBackground(int background) {
-        this.background = background;
-    }
-
     public void setDatas(ArrayList<Bitmap> datas) {
         this.datas = datas;
     }
@@ -79,36 +51,15 @@ public class ImagePageProviderAdapter implements CurlView.PageProvider {
         this.backDatas = backDatas;
     }
 
-
     public ImagePageProviderAdapter(ArrayList<Bitmap> data) {
         this.datas = data;
-    }
-
-    public int getMargin() {
-        return margin;
-    }
-
-    public int getPadding() {
-        return padding;
-    }
-
-    public int getBorder() {
-        return border;
-    }
-
-    public int getBorderColor() {
-        return borderColor;
-    }
-
-    public int getBackground() {
-        return background;
     }
 
     public boolean isShouldRotation(boolean isBack) {
         return isRotation && isBack && (viewMode == CurlRenderer.SHOW_TWO_PAGES);
     }
 
-    public void drawBorder(Canvas c, Rect r, int index) {
+    public void drawBorder(Canvas c, Rect r, int index, boolean isBack) {
         Rect leftR = new Rect();
         leftR.left = r.left;
         leftR.right = r.left + getBorder();
@@ -141,12 +92,25 @@ public class ImagePageProviderAdapter implements CurlView.PageProvider {
         c.drawRect(bottomR, p);
     }
 
-    public Bitmap getBitmap(int index) {
-        return datas.get(index);
+    @Override
+    public boolean isDrawable(int index, boolean isBack) {
+        if (isBack) {
+            return backDatas != null && backDatas.size() > index && backDatas.get(index) != null;
+        } else {
+            return datas != null && datas.size() > index && datas.get(index) != null;
+        }
     }
 
-    public void drawImageBitmap(Canvas c, Rect r, int index, boolean isBack) {
-        Bitmap d = getBitmap(index);
+    public Bitmap getItem(int index, boolean isBack) {
+        if (isBack) {
+            return backDatas.get(index);
+        } else {
+            return datas.get(index);
+        }
+    }
+
+    public void drawBitmap(Canvas c, Rect r, int index, boolean isBack) {
+        Bitmap d = getItem(index, isBack);
         int imageWidth = r.width() - (border * 2);
         int imageHeight = imageWidth * d.getHeight()/ d.getWidth();
         if (imageHeight > r.height() - (border * 2)) {
@@ -159,80 +123,15 @@ public class ImagePageProviderAdapter implements CurlView.PageProvider {
         r.top += (r.height() - imageHeight) / 2;
         r.bottom = r.top + imageHeight;
 
-        c.drawBitmap(d, r.left, r.top, new Paint());
-    }
-
-    private Bitmap loadImageBitmap(int width, int height, int index, boolean isBack){
-        Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        b.eraseColor(0xFFFFFFFF);
-        Canvas c = new Canvas(b);
-
-        int margin = getMargin();
-        int border = getBorder();
-        Rect r = new Rect(margin, margin, width - margin, height - margin);
-
-        Paint p = new Paint();
-        p.setColor(getBackground());
-        c.drawRect(r, p);
-
-        if (border != 0) {
-            drawBorder(c , r, index);
+        if (isShouldRotation(isBack)) {
+            updateCanvasLRSymmetry(c);
         }
 
-
-        r.left += (border + getPadding());
-        r.right -= (border + getPadding());
-        r.top += (border + getPadding());
-        r.bottom -= (border - getPadding());
-        if (isBack) {
-            drawImageBitmap(c, r, index, true);
-        } else {
-            drawImageBitmap(c, r, index, false);
-        }
-        return b;
-    }
-
-    private Bitmap loadImageBitmap(int width, int height, int index) {
-        return loadImageBitmap(width, height, index, false);
+        c.drawBitmap(d, null, r, new Paint());
     }
 
     @Override
     public int getPageCount() {
         return datas == null ? 0 : datas.size();
-    }
-
-    public void updateBackPage(CurlPage page, int width, int height, int index) {
-        if (viewMode == CurlRenderer.SHOW_TWO_PAGES) {
-            if (backDatas != null && index < backDatas.size()) {
-                Bitmap back = loadImageBitmap(width, height, index, true);
-                page.setTexture(back, CurlPage.SIDE_BACK);
-            } else {
-                page.setColor(Color.rgb(255, 255, 255), CurlPage.SIDE_BACK);
-            }
-        } else {
-            page.setColor(Color.argb(100, 255, 255, 255), CurlPage.SIDE_BACK);
-        }
-    }
-
-    public void updateFrontPage(CurlPage page, int width, int height, int index) {
-        Bitmap front = loadImageBitmap(width, height, index);
-        if (viewMode == CurlRenderer.SHOW_TWO_PAGES) {
-            page.setTexture(front, CurlPage.SIDE_FRONT);
-        } else {
-            page.setTexture(front, CurlPage.SIDE_BOTH);
-        }
-    }
-
-    @Override
-    public void updatePage(CurlPage page, int width, int height, int index) {
-        if (index >= 0 && index < getPageCount()) {
-            updateFrontPage(page, width, height, index);
-            updateBackPage(page, width, height, index);
-        }
-    }
-
-    @Override
-    public void updateViewMode(int viewMode) {
-        this.viewMode = viewMode;
     }
 }
