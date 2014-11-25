@@ -1,19 +1,12 @@
-package com.example.curl;
+package com.example.curl.adapter;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
-import android.text.Layout;
-import android.text.StaticLayout;
-import android.text.TextPaint;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+import android.util.Log;
+
+import com.example.curl.CurlRenderer;
 
 import java.util.ArrayList;
 
@@ -55,50 +48,22 @@ public class ImagePageProviderAdapter extends BasePageProviderAdapter {
         this.datas = data;
     }
 
+    public ImagePageProviderAdapter() {
+
+    }
+
     public boolean isShouldRotation(boolean isBack) {
         return isRotation && isBack && (viewMode == CurlRenderer.SHOW_TWO_PAGES);
     }
 
-    public void drawBorder(Canvas c, Rect r, int index, boolean isBack) {
-        Rect leftR = new Rect();
-        leftR.left = r.left;
-        leftR.right = r.left + getBorder();
-        leftR.top = r.top;
-        leftR.bottom = r.bottom;
-
-        Rect topR = new Rect();
-        topR.left = r.left;
-        topR.right = r.right;
-        topR.top = r.top;
-        topR.bottom = r.top + getBorder();
-
-        Rect rightR = new Rect();
-        rightR.left = r.right - getBorder();
-        rightR.right = r.right;
-        rightR.top = r.top;
-        rightR.bottom = r.bottom;
-
-        Rect bottomR = new Rect();
-        bottomR.left = r.left;
-        bottomR.right = r.right;
-        bottomR.top = r.bottom - getBorder();
-        bottomR.bottom = r.bottom;
-
-        Paint p = new Paint();
-        p.setColor(getBorderColor());
-        c.drawRect(leftR, p);
-        c.drawRect(topR, p);
-        c.drawRect(rightR, p);
-        c.drawRect(bottomR, p);
-    }
-
     @Override
-    public boolean isDrawable(int index, boolean isBack) {
-        if (isBack) {
-            return backDatas != null && backDatas.size() > index && backDatas.get(index) != null;
-        } else {
-            return datas != null && datas.size() > index && datas.get(index) != null;
-        }
+    public boolean isEnaleDrawed(int index, boolean isBack) {
+//        if (isBack) {
+//            return backDatas != null && backDatas.size() > index && backDatas.get(index) != null;
+//        } else {
+//            return datas != null && datas.size() > index && datas.get(index) != null;
+//        }
+        return super.isEnaleDrawed(index, isBack);
     }
 
     public Bitmap getItem(int index, boolean isBack) {
@@ -107,10 +72,16 @@ public class ImagePageProviderAdapter extends BasePageProviderAdapter {
         } else {
             return datas.get(index);
         }
+
     }
 
     public void drawBitmap(Canvas c, Rect r, int index, boolean isBack) {
+        Log.i("CURLVIEW", "drawBitmap");
         Bitmap d = getItem(index, isBack);
+        if (d == null) {
+            return ;
+        }
+
         int imageWidth = r.width() - (border * 2);
         int imageHeight = imageWidth * d.getHeight()/ d.getWidth();
         if (imageHeight > r.height() - (border * 2)) {

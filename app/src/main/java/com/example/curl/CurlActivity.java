@@ -28,8 +28,10 @@ import android.os.Bundle;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.text.TextUtils;
 import android.util.Log;
+
+import com.example.curl.adapter.ImagePageProviderAdapter;
+import com.example.curl.adapter.TextPageProviderAdapter;
 
 import java.util.ArrayList;
 
@@ -41,6 +43,11 @@ import java.util.ArrayList;
 public class CurlActivity extends Activity {
     private TextPageProviderAdapter textPageProviderAdapter;
     private ImagePageProviderAdapter imagePageProviderAdapter;
+    private AsynTextPageProviderAdapter asynTextPageProviderAdapter;
+    private TextPageProviderHandler textPageProviderHandler;
+    private ImagePageProviderHandler imagePageProviderHandler;
+    private AsynImagePageProviderAdapter asynImagePageProviderAdapter;
+
 	private CurlView mCurlView;
     private ArrayList<String> contents = new ArrayList<String>();
     private ArrayList<String> backContents = new ArrayList<String>();
@@ -82,13 +89,25 @@ public class CurlActivity extends Activity {
 		if (getLastNonConfigurationInstance() != null) {
 			index = (Integer) getLastNonConfigurationInstance();
 		}
+        asynTextPageProviderAdapter = new AsynTextPageProviderAdapter();
+        asynImagePageProviderAdapter = new AsynImagePageProviderAdapter();
         textPageProviderAdapter = new TextPageProviderAdapter(contents);
         imagePageProviderAdapter = new ImagePageProviderAdapter(bitmaps);
         imagePageProviderAdapter.setBackDatas(backBitmaps);
         textPageProviderAdapter.setBackDatas(backContents);
 		mCurlView = (CurlView) findViewById(R.id.curl);
-		mCurlView.setPageProvider(textPageProviderAdapter);
+
+        textPageProviderHandler = new TextPageProviderHandler(mCurlView);
+        asynTextPageProviderAdapter.setBasePageProviderHandler(textPageProviderHandler);
+        imagePageProviderHandler = new ImagePageProviderHandler(this, mCurlView);
+//        imagePageProviderAdapter.setBasePageProviderHandler(imagePageProviderHandler);
+        asynImagePageProviderAdapter.setImagePageProviderHandler(imagePageProviderHandler);
+//        textPageProviderAdapter.curlView = mCurlView;
+//        asynTextPageProviderAdapter.curlView = mCurlView;
+//		mCurlView.setPageProvider(textPageProviderAdapter);
 //        mCurlView.setPageProvider(imagePageProviderAdapter);
+//        mCurlView.setPageProvider(asynTextPageProviderAdapter);
+        mCurlView.setPageProvider(asynImagePageProviderAdapter);
 
 		mCurlView.setSizeChangedObserver(new SizeChangedObserver());
 		mCurlView.setCurrentIndex(index);

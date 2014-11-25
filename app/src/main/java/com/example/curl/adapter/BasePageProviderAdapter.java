@@ -1,4 +1,4 @@
-package com.example.curl;
+package com.example.curl.adapter;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -6,10 +6,10 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.Log;
-import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.example.curl.CurlPage;
+import com.example.curl.CurlRenderer;
+import com.example.curl.CurlView;
 
 /**
  * Created by Administrator on 2014/11/22.
@@ -80,9 +80,15 @@ public abstract class BasePageProviderAdapter implements CurlView.PageProvider {
 
     public abstract void drawBitmap(Canvas c, Rect r, int index, boolean isBack);
 
-    public abstract void drawBorder(Canvas c, Rect r, int index, boolean isBack);
+    public boolean isEnaleDrawed(int index, boolean isBack) {
+        return true;
+    }
 
-    public abstract boolean isDrawable(int index, boolean isBack);
+    public void drawBackground(Canvas c, Rect r, int index, boolean isBack) {
+        Paint p = new Paint();
+        p.setColor(getBackground());
+        c.drawRect(r, p);
+    }
 
     public Bitmap loadBitmap(int width, int height, int index, boolean isBack) {
         Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -93,11 +99,9 @@ public abstract class BasePageProviderAdapter implements CurlView.PageProvider {
         int border = getBorder();
         Rect r = new Rect(margin, margin, width - margin, height - margin);
 
-        Paint p = new Paint();
-        p.setColor(getBackground());
-        c.drawRect(r, p);
+        drawBackground(c, r, index, isBack);
 
-        if (!isDrawable(index, isBack)) {
+        if (!isEnaleDrawed(index, isBack)) {
             return b;
         }
 
@@ -116,6 +120,39 @@ public abstract class BasePageProviderAdapter implements CurlView.PageProvider {
             drawBitmap(c, r, index, false);
         }
         return b;
+    }
+
+    public void drawBorder(Canvas c, Rect r, int index, boolean isBack) {
+        Rect leftR = new Rect();
+        leftR.left = r.left;
+        leftR.right = r.left + getBorder();
+        leftR.top = r.top;
+        leftR.bottom = r.bottom;
+
+        Rect topR = new Rect();
+        topR.left = r.left;
+        topR.right = r.right;
+        topR.top = r.top;
+        topR.bottom = r.top + getBorder();
+
+        Rect rightR = new Rect();
+        rightR.left = r.right - getBorder();
+        rightR.right = r.right;
+        rightR.top = r.top;
+        rightR.bottom = r.bottom;
+
+        Rect bottomR = new Rect();
+        bottomR.left = r.left;
+        bottomR.right = r.right;
+        bottomR.top = r.bottom - getBorder();
+        bottomR.bottom = r.bottom;
+
+        Paint p = new Paint();
+        p.setColor(getBorderColor());
+        c.drawRect(leftR, p);
+        c.drawRect(topR, p);
+        c.drawRect(rightR, p);
+        c.drawRect(bottomR, p);
     }
 
     public void updateFrontPage(CurlPage page, int width, int height, int index) {
@@ -160,4 +197,5 @@ public abstract class BasePageProviderAdapter implements CurlView.PageProvider {
         matrix.postTranslate(c.getWidth(), 0);
         c.setMatrix(matrix);
     }
+
 }

@@ -110,6 +110,7 @@ public class CurlMesh {
 	 */
 	public CurlMesh(int maxCurlSplits) {
 		// There really is no use for 0 splits.
+        mTexturePage.setCurlMesh(this);
 		mMaxCurlSplits = maxCurlSplits < 1 ? 1 : maxCurlSplits;
 
 		mArrScanLines = new Array<Double>(maxCurlSplits + 2);

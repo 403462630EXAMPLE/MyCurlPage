@@ -25,6 +25,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.Stack;
+
 /**
  * OpenGL ES View.
  * 
@@ -50,6 +52,7 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 	private boolean mAllowLastPageCurl = true;
 
 	private boolean mAnimate = false;
+    public boolean isCurling = false;
 	private long mAnimationDurationTime = 300;
 	private PointF mAnimationSource = new PointF();
 	private long mAnimationStartTime;
@@ -59,7 +62,7 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 	private PointF mCurlDir = new PointF();
 
 	private PointF mCurlPos = new PointF();
-	private int mCurlState = CURL_NONE;
+	public int mCurlState = CURL_NONE;
 	// Current bitmap index. This is always showed as front of right page.
 	private int mCurrentIndex = 0;
 
@@ -186,6 +189,8 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 			mCurlState = CURL_NONE;
 			mAnimate = false;
 			requestRender();
+            isCurling = false;
+            notifyRequestRenderPage();
 		} else {
 			mPointerPos.mPos.set(mAnimationSource);
 			float t = 1f - ((float) (currentTime - mAnimationStartTime) / mAnimationDurationTime);
@@ -544,6 +549,7 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 		// curled page. And if there are more bitmaps available new bitmap is
 		// loaded into right side mesh.
 		case CURL_RIGHT: {
+            isCurling = true;
 			// Remove meshes from renderer.
 			mRenderer.removeCurlMesh(mPageLeft);
 			mRenderer.removeCurlMesh(mPageRight);
@@ -586,6 +592,7 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 		// there are more bitmaps available before currentIndex, new bitmap
 		// is loaded into left page.
 		case CURL_LEFT: {
+            isCurling = true;
 			// Remove meshes from renderer.
 			mRenderer.removeCurlMesh(mPageLeft);
 			mRenderer.removeCurlMesh(mPageRight);
@@ -742,7 +749,7 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 	/**
 	 * Updates given CurlPage via PageProvider for page located at index.
 	 */
-	private void updatePage(CurlPage page, int index) {
+	public void updatePage(CurlPage page, int index) {
 		// First reset page to initial state.
 		page.reset();
 		// Ask page provider to fill it up with bitmaps and colors.
@@ -754,60 +761,92 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 	 * Updates bitmaps for page meshes.
 	 */
 	private void updatePages() {
-		if (mPageProvider == null || mPageBitmapWidth <= 0
-				|| mPageBitmapHeight <= 0) {
-			return;
-		}
-
-		// Remove meshes from renderer.
-		mRenderer.removeCurlMesh(mPageLeft);
-		mRenderer.removeCurlMesh(mPageRight);
-		mRenderer.removeCurlMesh(mPageCurl);
-
-		int leftIdx = mCurrentIndex - 1;
-		int rightIdx = mCurrentIndex;
-		int curlIdx = -1;
-		if (mCurlState == CURL_LEFT) {
-			curlIdx = leftIdx;
-			--leftIdx;
-		} else if (mCurlState == CURL_RIGHT) {
-			curlIdx = rightIdx;
-			++rightIdx;
-		}
-
-		if (rightIdx >= 0 && rightIdx < mPageProvider.getPageCount()) {
-			updatePage(mPageRight.getTexturePage(), rightIdx);
-			mPageRight.setFlipTexture(false);
-			mPageRight.setRect(mRenderer.getPageRect(CurlRenderer.PAGE_RIGHT));
-			mPageRight.reset();
-			mRenderer.addCurlMesh(mPageRight);
-		}
-		if (leftIdx >= 0 && leftIdx < mPageProvider.getPageCount()) {
-			updatePage(mPageLeft.getTexturePage(), leftIdx);
-			mPageLeft.setFlipTexture(true);
-			mPageLeft.setRect(mRenderer.getPageRect(CurlRenderer.PAGE_LEFT));
-			mPageLeft.reset();
-			if (mRenderLeftPage) {
-				mRenderer.addCurlMesh(mPageLeft);
-			}
-		}
-		if (curlIdx >= 0 && curlIdx < mPageProvider.getPageCount()) {
-			updatePage(mPageCurl.getTexturePage(), curlIdx);
-
-			if (mCurlState == CURL_RIGHT) {
-				mPageCurl.setFlipTexture(true);
-				mPageCurl.setRect(mRenderer
-						.getPageRect(CurlRenderer.PAGE_RIGHT));
-			} else {
-				mPageCurl.setFlipTexture(false);
-				mPageCurl
-						.setRect(mRenderer.getPageRect(CurlRenderer.PAGE_LEFT));
-			}
-
-			mPageCurl.reset();
-			mRenderer.addCurlMesh(mPageCurl);
-		}
+		updatePage(-1);
 	}
+
+    private void updatePage(Integer index) {
+        if (mPageProvider == null || mPageBitmapWidth <= 0
+                || mPageBitmapHeight <= 0) {
+            return;
+        }
+
+        // Remove meshes from renderer.
+        mRenderer.removeCurlMesh(mPageLeft);
+        mRenderer.removeCurlMesh(mPageRight);
+        mRenderer.removeCurlMesh(mPageCurl);
+        Log.i("CURLVIEW", "currentIndex:" + mCurrentIndex + "; mCurlState:" + mCurlState);
+        int leftIdx = mCurrentIndex - 1;
+        int rightIdx = mCurrentIndex;
+        int curlIdx = -1;
+        if (mCurlState == CURL_LEFT) {
+            curlIdx = leftIdx;
+            --leftIdx;
+        } else if (mCurlState == CURL_RIGHT) {
+            curlIdx = rightIdx;
+            ++rightIdx;
+        }
+
+        if (rightIdx >= 0 && rightIdx < mPageProvider.getPageCount()) {
+            if (index == -1 || index == rightIdx) {
+                updatePage(mPageRight.getTexturePage(), rightIdx);
+            }
+            mPageRight.setFlipTexture(false);
+            mPageRight.setRect(mRenderer.getPageRect(CurlRenderer.PAGE_RIGHT));
+            mPageRight.reset();
+            mRenderer.addCurlMesh(mPageRight);
+        }
+        if (leftIdx >= 0 && leftIdx < mPageProvider.getPageCount()) {
+            if (index == -1 || index == leftIdx) {
+                updatePage(mPageLeft.getTexturePage(), leftIdx);
+            }
+            mPageLeft.setFlipTexture(true);
+            mPageLeft.setRect(mRenderer.getPageRect(CurlRenderer.PAGE_LEFT));
+            mPageLeft.reset();
+            if (mRenderLeftPage) {
+                mRenderer.addCurlMesh(mPageLeft);
+            }
+        }
+        if (curlIdx >= 0 && curlIdx < mPageProvider.getPageCount()) {
+            if (index == -1 || index == curlIdx) {
+                updatePage(mPageCurl.getTexturePage(), curlIdx);
+            }
+
+            if (mCurlState == CURL_RIGHT) {
+                mPageCurl.setFlipTexture(false);
+                mPageCurl.setRect(mRenderer
+                        .getPageRect(CurlRenderer.PAGE_RIGHT));
+            } else {
+                mPageCurl.setFlipTexture(false);
+                mPageCurl
+                        .setRect(mRenderer.getPageRect(CurlRenderer.PAGE_LEFT));
+            }
+
+            mPageCurl.reset();
+            mRenderer.addCurlMesh(mPageCurl);
+        }
+    }
+
+    public void requestRenderPage(int index) {
+        int currentIndex = getCurrentIndex();
+        if (index >= (currentIndex - 2) && index <= (currentIndex + 1)) {
+            updatePage(index);
+            requestRender();
+        }
+    }
+
+    private Stack<Integer> stack = new Stack<Integer>();
+
+    public void addRequestRenderPage(int index) {
+        stack.push(index);
+    }
+
+    private void notifyRequestRenderPage() {
+        Integer index = null;
+        while(!stack.isEmpty()) {
+            index = stack.pop();
+            requestRenderPage(index);
+        }
+    }
 
 	/**
 	 * Provider for feeding 'book' with bitmaps which are used for rendering

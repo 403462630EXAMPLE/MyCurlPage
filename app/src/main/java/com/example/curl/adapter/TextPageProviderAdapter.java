@@ -1,14 +1,15 @@
-package com.example.curl;
+package com.example.curl.adapter;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.util.Log;
+
+import com.example.curl.CurlPage;
+import com.example.curl.CurlRenderer;
 
 import java.util.ArrayList;
 
@@ -39,7 +40,7 @@ public class TextPageProviderAdapter extends BasePageProviderAdapter {
         this.isRotation = isRotation;
     }
 
-    public String getItem(int index, boolean isBack) {
+    public String getItem(final int index, boolean isBack) {
         if (isBack) {
             return backDatas.get(index);
         } else {
@@ -48,12 +49,13 @@ public class TextPageProviderAdapter extends BasePageProviderAdapter {
     }
 
     @Override
-    public boolean isDrawable(int index, boolean isBack) {
-        if (isBack) {
-            return (backDatas != null) && (backDatas.size() > index) && (backDatas.get(index) != null);
-        } else {
-            return (datas != null) && (datas.size() > index) && (datas.get(index) != null);
-        }
+    public boolean isEnaleDrawed(int index, boolean isBack) {
+//        if (isBack) {
+//            return (backDatas != null) && (backDatas.size() > index) && (backDatas.get(index) != null);
+//        } else {
+//            return (datas != null) && (datas.size() > index) && (datas.get(index) != null);
+//        }
+        return super.isEnaleDrawed(index, isBack);
     }
 
     public void setDatas(ArrayList<String> datas) {
@@ -67,14 +69,20 @@ public class TextPageProviderAdapter extends BasePageProviderAdapter {
     public TextPageProviderAdapter(ArrayList<String> data) {
         this.datas = data;
     }
+    public TextPageProviderAdapter() {
+
+    }
 
     public boolean isShouldRotation(boolean isBack) {
         return isRotation && isBack && (viewMode == CurlRenderer.SHOW_TWO_PAGES);
     }
 
-    public void drawBitmap(Canvas c, Rect r, int index, boolean isBack) {
+    public void drawBitmap(final Canvas c, Rect r, final int index, boolean isBack) {
+        Log.i("CURLVIEW", "drawBitmap--" + index);
         String data = getItem(index, isBack);
-
+        if (data == null) {
+            return ;
+        }
         TextPaint textPaint = new TextPaint();
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(28f);
@@ -86,42 +94,15 @@ public class TextPageProviderAdapter extends BasePageProviderAdapter {
         staticLayout.draw(c);
     }
 
-    public void drawBorder(Canvas c, Rect r, int index, boolean isBack) {
-        Rect leftR = new Rect();
-        leftR.left = r.left;
-        leftR.right = r.left + getBorder();
-        leftR.top = r.top;
-        leftR.bottom = r.bottom;
-
-        Rect topR = new Rect();
-        topR.left = r.left;
-        topR.right = r.right;
-        topR.top = r.top;
-        topR.bottom = r.top + getBorder();
-
-        Rect rightR = new Rect();
-        rightR.left = r.right - getBorder();
-        rightR.right = r.right;
-        rightR.top = r.top;
-        rightR.bottom = r.bottom;
-
-        Rect bottomR = new Rect();
-        bottomR.left = r.left;
-        bottomR.right = r.right;
-        bottomR.top = r.bottom - getBorder();
-        bottomR.bottom = r.bottom;
-
-        Paint p = new Paint();
-        p.setColor(getBorderColor());
-        c.drawRect(leftR, p);
-        c.drawRect(topR, p);
-        c.drawRect(rightR, p);
-        c.drawRect(bottomR, p);
+    @Override
+    public void updatePage(CurlPage page, int width, int height, int index) {
+//        Log.i("CURLVIEW", "updatePage--index:" + index + "--currentIndex:" + curlView.getCurrentIndex());
+        super.updatePage(page, width, height, index);
     }
 
     @Override
     public int getPageCount() {
-//        return datas == null ? 0 : datas.size();
-        return 10;
+        return datas == null ? 0 : datas.size();
+//        return 10;
     }
 }

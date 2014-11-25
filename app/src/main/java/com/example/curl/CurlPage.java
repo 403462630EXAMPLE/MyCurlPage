@@ -39,6 +39,16 @@ public class CurlPage {
 	private Bitmap mTextureFront;
 	private boolean mTexturesChanged;
 
+    public CurlMesh getCurlMesh() {
+        return curlMesh;
+    }
+
+    public void setCurlMesh(CurlMesh curlMesh) {
+        this.curlMesh = curlMesh;
+    }
+
+    private CurlMesh curlMesh;
+
 	/**
 	 * Default constructor.
 	 */
